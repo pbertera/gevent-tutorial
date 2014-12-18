@@ -86,7 +86,7 @@
 <p>La struttura di questo tutorial richiede solamente un livello intermedio
 di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi di concorrenza. L'obiettivo e' quello di fornirti gli strumenti necessari per lavorare con gevent, aiutarti nel gestire problemi di concorrenza ed iniziare a scrivere codice asincrono oggi.</p>
 <h3 id="contributi">Contributi</h3>
-<p>In chronological order of contribution:
+<p>Nell' ordine cronologico di aiuto:
 <a href="http://www.stephendiehl.com">Stephen Diehl</a>
 <a href="https://github.com/jerem">J&eacute;r&eacute;my Bethmont</a>
 <a href="https://github.com/sww">sww</a>
@@ -226,15 +226,15 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
-Task 3 done
-Task 4 done
-Task 8 done
 Task 0 done
-Task 5 done
-Task 6 done
-Task 9 done
 Task 2 done
+Task 6 done
+Task 8 done
+Task 1 done
+Task 4 done
+Task 9 done
+Task 3 done
+Task 5 done
 Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
@@ -930,11 +930,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 4449415568
+Hello from Greenlet 4497191312
 Size of group 3
-Hello from Greenlet 4449416688
+Hello from Greenlet 4497192432
 Size of group 3
-Hello from Greenlet 4449416208
+Hello from Greenlet 4497191952
 Ordered
 ('task', 0)
 ('task', 1)

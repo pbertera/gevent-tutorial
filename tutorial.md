@@ -7,7 +7,7 @@ di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi d
 
 ### Contributi
 
-In chronological order of contribution:
+Nell' ordine cronologico di aiuto:
 [Stephen Diehl](http://www.stephendiehl.com)
 [J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
 [sww](https://github.com/sww)
@@ -26,12 +26,7 @@ Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
 Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
 Qualsiasi contributo e' benvenuto.
 
-<<<<<<< HEAD
-This page is also available in [Japanese](http://methane.github.com/gevent-tutorial-ja), 
-[Chinese](http://xlambda.com/gevent-tutorial/) and [Spanish](http://ovnicraft.github.io/gevent/).
-=======
 Questa pagina e' anche [disponibile in Japanese](http://methane.github.com/gevent-tutorial-ja).
->>>>>>> master
 
 # Core
 

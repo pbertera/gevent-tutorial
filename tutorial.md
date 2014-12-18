@@ -7,7 +7,7 @@ di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi d
 
 ### Contributi
 
-In chronological order of contribution:
+Nell' ordine cronologico di aiuto:
 [Stephen Diehl](http://www.stephendiehl.com)
 [J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
 [sww](https://github.com/sww)

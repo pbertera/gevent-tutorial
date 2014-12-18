@@ -223,29 +223,19 @@ print(run1 == run2 == run3 == run4)
 True</code>
 </pre>
 
-Even though gevent is normally deterministic, sources of
-non-determinism can creep into your program when you begin to
-interact with outside services such as sockets and files. Thus
-even though green threads are a form of "deterministic
-concurrency", they still can experience some of the same problems
-that POSIX threads and processes experience.
+Nonostante gevent sia normalmente deterministica, sorgenti di non-determinismo potrebbero insinuarsi nel programma quando inizi ad interagire con servizi esterni come socket o file. Quindi nonostante i green thread siano una forma di "deterministic concurrency", possono essere comunque affetti dagli stessi problemi dei thread POSIX e dei processi.
 
-The perennial problem involved with concurrency is known as a
-*race condition*. Simply put, a race condition occurs when two concurrent threads
-/ processes depend on some shared resource but also attempt to
-modify this value. This results in resources which values become
-time-dependent on the execution order. This is a problem, and in
-general one should very much try to avoid race conditions since
-they result in a globally non-deterministic program behavior.
+Il perenne problema legato alla concorrenza e' noto come *race condition*. Semplificando, una race condition avviene quando due thread concorrenti / processi dipendono dalla stessa risorsa condivisa ed entrambi provano a modificarne il valore. Questo finira' con delle risorse il cui valore diventa dipendente nel tempo dall'ordine di esecuzione. Questo e' un problema ed in generale si dovrebbe cercare di evitare race condition in quanto portano il risultato ad un comportamento non deterministico. 
+
+Il migliore approccio e' quello di evitare sempre tutti gli stati globali
 
 The best approach to this is to simply avoid all global state at all
-times. Global state and import-time side effects will always come
-back to bite you!
+times. Gli effetti collaterali di stati globali e tempi di import torneranno sempre per morderti!
 
-## Spawning Greenlets
+## Lanciare Greenlets
 
-gevent provides a few wrappers around Greenlet initialization.
-Some of the most common patterns are:
+gevent fornisce alcuni wrapper attorno all'inizializzazione delle Greenlet.
+Alcuni dei modelli piu' comuni sono:
 
 [[[cog
 import gevent
@@ -277,8 +267,7 @@ gevent.joinall(threads)
 ]]]
 [[[end]]]
 
-In addition to using the base Greenlet class, you may also subclass
-Greenlet class and override the ``_run`` method.
+Oltre ad utilizzate la classe base Greenlet, si puo' anche fare subclassing e sovrascrivere il metodo ``_run``.
 
 [[[cog
 import gevent
@@ -302,21 +291,17 @@ g.join()
 [[[end]]]
 
 
-## Greenlet State
+## Stato della Greenlet
 
-Like any other segment of code, Greenlets can fail in various
-ways. A greenlet may fail to throw an exception, fail to halt or
-consume too many system resources.
+Come ogni altra parte di codice, una Greenlet puo' fallire in vari modi. Una greenlet puo' fallire lanciando un'eccezione, bloccarsi oppure consumare troppe risorse di sistema.
 
-The internal state of a greenlet is generally a time-dependent
-parameter. There are a number of flags on greenlets which let
-you monitor the state of the thread:
+Lo stato interno di una greenlet e' in genere un parametro dipendente dal tempo. Ci sono alcuni flag nelle greenlet che permettono di monitorare lo stato del thread:
 
-- ``started`` -- Boolean, indicates whether the Greenlet has been started
-- ``ready()`` -- Boolean, indicates whether the Greenlet has halted
-- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception
-- ``value`` -- arbitrary, the value returned by the Greenlet
-- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet
+- ``started`` -- Booleano, indica se la Greenlet e' partita
+- ``ready()`` -- Booleano, indica se la Greenlet si e' fermata
+- ``successful()`` -- Booleano, indica se la Greenlet si e' fermata senza sollevare eccezzioni
+- ``value`` -- arbitrario, il valore ritornato dalla greenlet
+- ``exception`` -- eccezione, eccezione non gestita sollevata all'interno della greenlet
 
 [[[cog
 import gevent
@@ -361,15 +346,11 @@ print(loser.exception)
 ]]]
 [[[end]]]
 
-## Program Shutdown
+## Spegnimento del programma
 
-Greenlets that fail to yield when the main program receives a
-SIGQUIT may hold the program's execution longer than expected.
-This results in so called "zombie processes" which need to be
-killed from outside of the Python interpreter.
+Greenlets che falliscono nello yeld mentre il programma principale riceve un segnale SIGQUIT potrebbero trattenere l'esecuzione del programma per un tempo piu' lungo dell'aspettato. Questo finira' per creare un "processo zombie" che deve essere ucciso fuori dall'interprete Python.
 
-A common pattern is to listen SIGQUIT events on the main program
-and to invoke ``gevent.shutdown`` before exit.
+Un modello comune e' quello di gestire i segnali SIGQUIT nel programma principale e invocare ``gevent.shutdown`` prima di uscire.
 
 <pre>
 <code class="python">import gevent
@@ -385,10 +366,9 @@ if __name__ == '__main__':
 </code>
 </pre>
 
-## Timeouts
+## Timeout
 
-Timeouts are a constraint on the runtime of a block of code or a
-Greenlet.
+Timeout sono dei limiti di tempo di esecuzione di un pezzo di codice o una Greenlet.
 
 <pre>
 <code class="python">
@@ -411,7 +391,7 @@ except Timeout:
 </code>
 </pre>
 
-They can also be used with a context manager, in a ``with`` statement.
+I timeout possono anche essere usati con un context manager all'interno di una direttiva ``with``.
 
 <pre>
 <code class="python">import gevent
@@ -427,8 +407,7 @@ with Timeout(time_to_wait, TooLong):
 </code>
 </pre>
 
-In addition, gevent also provides timeout arguments for a
-variety of Greenlet and data stucture related calls. For example:
+Inoltre, gevent fornisce argomenti di timeout per diverse Greenlet, strutture dati e relative chiamate. Per esempio:
 
 [[[cog
 import gevent

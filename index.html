@@ -185,12 +185,8 @@ Hey lets do some stuff while the greenlets poll, at 0.0 seconds
 Ended Polling: at 2.0 seconds
 Ended Polling: at 2.0 seconds
 </pre></code></p>
-<p>Another somewhat synthetic example defines a <code>task</code> function
-which is <em>non-deterministic</em>
-(i.e. its output is not guaranteed to give the same result for
-the same inputs). In this case the side effect of running the
-function is that the task pauses its execution for a random
-number of seconds.</p>
+<p>Un altro sintetico esempio definisce una funzione <code>task</code> non deterministica (ovvero non garantisce dare sempre lo stesso output per il medesimo input).
+In questo caso l'effetto collaterale e' che il task fermera' l'esecuzione per un numero random di secondi.</p>
 <pre><code class="python">
 import gevent
 import random
@@ -231,15 +227,15 @@ Task 8 done
 Task 9 done
 Asynchronous:
 Task 1 done
-Task 2 done
-Task 4 done
-Task 0 done
 Task 3 done
-Task 6 done
-Task 7 done
+Task 4 done
 Task 8 done
-Task 9 done
+Task 0 done
 Task 5 done
+Task 6 done
+Task 9 done
+Task 2 done
+Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -934,11 +930,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 4511216016
+Hello from Greenlet 4449415568
 Size of group 3
-Hello from Greenlet 4511217136
+Hello from Greenlet 4449416688
 Size of group 3
-Hello from Greenlet 4511216656
+Hello from Greenlet 4449416208
 Ordered
 ('task', 0)
 ('task', 1)

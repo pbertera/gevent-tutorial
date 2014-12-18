@@ -137,31 +137,14 @@ asynchronous()
 ]]]
 [[[end]]]
 
-In the synchronous case all the tasks are run sequentially,
-which results in the main programming *blocking* (
-i.e. pausing the execution of the main program )
-while each task executes.
+Nel caso sincrono tutti i task sono lanciati in maniera sequenziale, facendo cosi' che il programma principale rimanga in stato *blocking* (rimane bloccato finche' non e' terminato ogni task) durante l'esecuzione dei task.
 
-The important parts of the program are the
-``gevent.spawn`` which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets
-are stored in the array ``threads`` which is passed to
-the ``gevent.joinall`` function which blocks the current
-program to run all the given greenlets. The execution will step
-forward only when all the greenlets terminate.
+La parte importante del programma e' il ``gevent.spawn`` che include la funzione passata all'interno di un Greenlet thread. La lista delle greenlet inizializzate viene salvata nell'array ``threads`` il quale viene passato alla funzione ``gevent.joinall`` la quale blocca l'esecuzione del programma corrente e lancia tutte le greenlet ricevute. L'esecuzione del programma principale riprendera' quando tutte le greenlet sono terminate.
 
-The important fact to notice is that the order of execution in
-the async case is essentially random and that the total execution
-time in the async case is much less than the sync case. In fact
-the maximum time for the synchronous case to complete is when
-each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
-whole queue. In the async case the maximum runtime is roughly 0.002
-seconds since none of the tasks block the execution of the
-others.
+E' importante notare il fatto che l'ordine di esecuzione delle greenlet nel caso asincrono e' essenzialmente random e il tempo totale di esecuzione in modalita' asincrona e' di molto minore della modalita' sincrona. Infatti il massimo tempo di esecuzione nel caso sincrono e' quando ogni task si ferma per 0.002 secondi, facendo cosi' un totale di 0.02 secondi per l'intera coda. Nel caso asincrono il tempo massimo impiegato sara' all'incirca di 0.002 secondi perche' nessuno dei task blocca l'esecuzione degli altri.
 
-In a more common use case, asynchronously fetching data from a server,
-the runtime of ``fetch()`` will differ between
-requests, depending on the load on the remote server at the time of the request.
+In uno use-case piu' comune, ricevendo dati in maniera asincrona da un server, il tempo di esecuzione di ``fetch()` sara' differente per ogni richiesta, in funzione del carico sul server remoto nel momento della richiesta.
+at the time of the request.
 
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
@@ -197,12 +180,9 @@ asynchronous()
 </code>
 </pre>
 
-## Determinism
+## Determinismo
 
-As mentioned previously, greenlets are deterministic. Given the same
-configuration of greenlets and the same set of inputs, they always
-produce the same output. For example, let's spread a task across a
-multiprocessing pool and compare its results to the one of a gevent pool.
+Come detto prima, le greenlets sono deterministiche. Data la medesima configurazione di greenlet e lo stesso set di input, loro produrranno lo stesso output. Per esempio, distribuiamo l'esecuzione di un task su di un multiprocessing pool e compariamo il risultato con quello di un greenlet pool.
 
 <pre>
 <code class="python">

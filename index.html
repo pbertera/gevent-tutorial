@@ -52,7 +52,7 @@
 <li><a href="#core">Core</a><ul>
 <li><a href="#greenlets">Greenlets</a></li>
 <li><a href="#esecuzione-sincrona-asincrona">Esecuzione sincrona &amp; asincrona</a></li>
-<li><a href="#determinism">Determinism</a></li>
+<li><a href="#determinismo">Determinismo</a></li>
 <li><a href="#spawning-greenlets">Spawning Greenlets</a></li>
 <li><a href="#greenlet-state">Greenlet State</a></li>
 <li><a href="#program-shutdown">Program Shutdown</a></li>
@@ -226,39 +226,22 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 0 done
-Task 2 done
-Task 6 done
-Task 8 done
 Task 1 done
-Task 4 done
+Task 2 done
+Task 7 done
 Task 9 done
 Task 3 done
+Task 6 done
+Task 8 done
+Task 0 done
+Task 4 done
 Task 5 done
-Task 7 done
 </pre></code></p>
-<p>In the synchronous case all the tasks are run sequentially,
-which results in the main programming <em>blocking</em> (
-i.e. pausing the execution of the main program )
-while each task executes.</p>
-<p>The important parts of the program are the
-<code>gevent.spawn</code> which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets
-are stored in the array <code>threads</code> which is passed to
-the <code>gevent.joinall</code> function which blocks the current
-program to run all the given greenlets. The execution will step
-forward only when all the greenlets terminate.</p>
-<p>The important fact to notice is that the order of execution in
-the async case is essentially random and that the total execution
-time in the async case is much less than the sync case. In fact
-the maximum time for the synchronous case to complete is when
-each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
-whole queue. In the async case the maximum runtime is roughly 0.002
-seconds since none of the tasks block the execution of the
-others.</p>
-<p>In a more common use case, asynchronously fetching data from a server,
-the runtime of <code>fetch()</code> will differ between
-requests, depending on the load on the remote server at the time of the request.</p>
+<p>Nel caso sincrono tutti i task sono lanciati in maniera sequenziale, facendo cosi' che il programma principale rimanga in stato <em>blocking</em> (rimane bloccato finche' non e' terminato ogni task) durante l'esecuzione dei task.</p>
+<p>La parte importante del programma e' il <code>gevent.spawn</code> che include la funzione passata all'interno di un Greenlet thread. La lista delle greenlet inizializzate viene salvata nell'array <code>threads</code> il quale viene passato alla funzione <code>gevent.joinall</code> la quale blocca l'esecuzione del programma corrente e lancia tutte le greenlet ricevute. L'esecuzione del programma principale riprendera' quando tutte le greenlet sono terminate.</p>
+<p>E' importante notare il fatto che l'ordine di esecuzione delle greenlet nel caso asincrono e' essenzialmente random e il tempo totale di esecuzione in modalita' asincrona e' di molto minore della modalita' sincrona. Infatti il massimo tempo di esecuzione nel caso sincrono e' quando ogni task si ferma per 0.002 secondi, facendo cosi' un totale di 0.02 secondi per l'intera coda. Nel caso asincrono il tempo massimo impiegato sara' all'incirca di 0.002 secondi perche' nessuno dei task blocca l'esecuzione degli altri.</p>
+<p>In uno use-case piu' comune, ricevendo dati in maniera asincrona da un server, il tempo di esecuzione di <code>`fetch()</code> sara' differente per ogni richiesta, in funzione del carico sul server remoto nel momento della richiesta.
+at the time of the request.</p>
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
 
@@ -293,7 +276,7 @@ asynchronous()
 </code>
 </pre>
 
-<h2 id="determinism">Determinism</h2>
+<h2 id="determinismo">Determinismo</h2>
 <p>As mentioned previously, greenlets are deterministic. Given the same
 configuration of greenlets and the same set of inputs, they always
 produce the same output. For example, let's spread a task across a
@@ -930,11 +913,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 4497191312
+Hello from Greenlet 4310536592
 Size of group 3
-Hello from Greenlet 4497192432
+Hello from Greenlet 4310537712
 Size of group 3
-Hello from Greenlet 4497191952
+Hello from Greenlet 4310537232
 Ordered
 ('task', 0)
 ('task', 1)

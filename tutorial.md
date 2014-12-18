@@ -137,31 +137,14 @@ asynchronous()
 ]]]
 [[[end]]]
 
-In the synchronous case all the tasks are run sequentially,
-which results in the main programming *blocking* (
-i.e. pausing the execution of the main program )
-while each task executes.
+Nel caso sincrono tutti i task sono lanciati in maniera sequenziale, facendo cosi' che il programma principale rimanga in stato *blocking* (rimane bloccato finche' non e' terminato ogni task) durante l'esecuzione dei task.
 
-The important parts of the program are the
-``gevent.spawn`` which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets
-are stored in the array ``threads`` which is passed to
-the ``gevent.joinall`` function which blocks the current
-program to run all the given greenlets. The execution will step
-forward only when all the greenlets terminate.
+La parte importante del programma e' il ``gevent.spawn`` che include la funzione passata all'interno di un Greenlet thread. La lista delle greenlet inizializzate viene salvata nell'array ``threads`` il quale viene passato alla funzione ``gevent.joinall`` la quale blocca l'esecuzione del programma corrente e lancia tutte le greenlet ricevute. L'esecuzione del programma principale riprendera' quando tutte le greenlet sono terminate.
 
-The important fact to notice is that the order of execution in
-the async case is essentially random and that the total execution
-time in the async case is much less than the sync case. In fact
-the maximum time for the synchronous case to complete is when
-each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
-whole queue. In the async case the maximum runtime is roughly 0.002
-seconds since none of the tasks block the execution of the
-others.
+E' importante notare il fatto che l'ordine di esecuzione delle greenlet nel caso asincrono e' essenzialmente random e il tempo totale di esecuzione in modalita' asincrona e' di molto minore della modalita' sincrona. Infatti il massimo tempo di esecuzione nel caso sincrono e' quando ogni task si ferma per 0.002 secondi, facendo cosi' un totale di 0.02 secondi per l'intera coda. Nel caso asincrono il tempo massimo impiegato sara' all'incirca di 0.002 secondi perche' nessuno dei task blocca l'esecuzione degli altri.
 
-In a more common use case, asynchronously fetching data from a server,
-the runtime of ``fetch()`` will differ between
-requests, depending on the load on the remote server at the time of the request.
+In uno use-case piu' comune, ricevendo dati in maniera asincrona da un server, il tempo di esecuzione di ``fetch()` sara' differente per ogni richiesta, in funzione del carico sul server remoto nel momento della richiesta.
+at the time of the request.
 
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
@@ -197,12 +180,9 @@ asynchronous()
 </code>
 </pre>
 
-## Determinism
+## Determinismo
 
-As mentioned previously, greenlets are deterministic. Given the same
-configuration of greenlets and the same set of inputs, they always
-produce the same output. For example, let's spread a task across a
-multiprocessing pool and compare its results to the one of a gevent pool.
+Come detto prima, le greenlets sono deterministiche. Data la medesima configurazione di greenlet e lo stesso set di input, loro produrranno lo stesso output. Per esempio, distribuiamo l'esecuzione di un task su di un multiprocessing pool e compariamo il risultato con quello di un greenlet pool.
 
 <pre>
 <code class="python">
@@ -243,29 +223,19 @@ print(run1 == run2 == run3 == run4)
 True</code>
 </pre>
 
-Even though gevent is normally deterministic, sources of
-non-determinism can creep into your program when you begin to
-interact with outside services such as sockets and files. Thus
-even though green threads are a form of "deterministic
-concurrency", they still can experience some of the same problems
-that POSIX threads and processes experience.
+Nonostante gevent sia normalmente deterministica, sorgenti di non-determinismo potrebbero insinuarsi nel programma quando inizi ad interagire con servizi esterni come socket o file. Quindi nonostante i green thread siano una forma di "deterministic concurrency", possono essere comunque affetti dagli stessi problemi dei thread POSIX e dei processi.
 
-The perennial problem involved with concurrency is known as a
-*race condition*. Simply put, a race condition occurs when two concurrent threads
-/ processes depend on some shared resource but also attempt to
-modify this value. This results in resources which values become
-time-dependent on the execution order. This is a problem, and in
-general one should very much try to avoid race conditions since
-they result in a globally non-deterministic program behavior.
+Il perenne problema legato alla concorrenza e' noto come *race condition*. Semplificando, una race condition avviene quando due thread concorrenti / processi dipendono dalla stessa risorsa condivisa ed entrambi provano a modificarne il valore. Questo finira' con delle risorse il cui valore diventa dipendente nel tempo dall'ordine di esecuzione. Questo e' un problema ed in generale si dovrebbe cercare di evitare race condition in quanto portano il risultato ad un comportamento non deterministico. 
+
+Il migliore approccio e' quello di evitare sempre tutti gli stati globali
 
 The best approach to this is to simply avoid all global state at all
-times. Global state and import-time side effects will always come
-back to bite you!
+times. Gli effetti collaterali di stati globali e tempi di import torneranno sempre per morderti!
 
-## Spawning Greenlets
+## Lanciare Greenlets
 
-gevent provides a few wrappers around Greenlet initialization.
-Some of the most common patterns are:
+gevent fornisce alcuni wrapper attorno all'inizializzazione delle Greenlet.
+Alcuni dei modelli piu' comuni sono:
 
 [[[cog
 import gevent
@@ -297,8 +267,7 @@ gevent.joinall(threads)
 ]]]
 [[[end]]]
 
-In addition to using the base Greenlet class, you may also subclass
-Greenlet class and override the ``_run`` method.
+Oltre ad utilizzate la classe base Greenlet, si puo' anche fare subclassing e sovrascrivere il metodo ``_run``.
 
 [[[cog
 import gevent
@@ -322,21 +291,17 @@ g.join()
 [[[end]]]
 
 
-## Greenlet State
+## Stato della Greenlet
 
-Like any other segment of code, Greenlets can fail in various
-ways. A greenlet may fail to throw an exception, fail to halt or
-consume too many system resources.
+Come ogni altra parte di codice, una Greenlet puo' fallire in vari modi. Una greenlet puo' fallire lanciando un'eccezione, bloccarsi oppure consumare troppe risorse di sistema.
 
-The internal state of a greenlet is generally a time-dependent
-parameter. There are a number of flags on greenlets which let
-you monitor the state of the thread:
+Lo stato interno di una greenlet e' in genere un parametro dipendente dal tempo. Ci sono alcuni flag nelle greenlet che permettono di monitorare lo stato del thread:
 
-- ``started`` -- Boolean, indicates whether the Greenlet has been started
-- ``ready()`` -- Boolean, indicates whether the Greenlet has halted
-- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception
-- ``value`` -- arbitrary, the value returned by the Greenlet
-- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet
+- ``started`` -- Booleano, indica se la Greenlet e' partita
+- ``ready()`` -- Booleano, indica se la Greenlet si e' fermata
+- ``successful()`` -- Booleano, indica se la Greenlet si e' fermata senza sollevare eccezzioni
+- ``value`` -- arbitrario, il valore ritornato dalla greenlet
+- ``exception`` -- eccezione, eccezione non gestita sollevata all'interno della greenlet
 
 [[[cog
 import gevent
@@ -381,15 +346,11 @@ print(loser.exception)
 ]]]
 [[[end]]]
 
-## Program Shutdown
+## Spegnimento del programma
 
-Greenlets that fail to yield when the main program receives a
-SIGQUIT may hold the program's execution longer than expected.
-This results in so called "zombie processes" which need to be
-killed from outside of the Python interpreter.
+Greenlets che falliscono nello yeld mentre il programma principale riceve un segnale SIGQUIT potrebbero trattenere l'esecuzione del programma per un tempo piu' lungo dell'aspettato. Questo finira' per creare un "processo zombie" che deve essere ucciso fuori dall'interprete Python.
 
-A common pattern is to listen SIGQUIT events on the main program
-and to invoke ``gevent.shutdown`` before exit.
+Un modello comune e' quello di gestire i segnali SIGQUIT nel programma principale e invocare ``gevent.shutdown`` prima di uscire.
 
 <pre>
 <code class="python">import gevent
@@ -405,10 +366,9 @@ if __name__ == '__main__':
 </code>
 </pre>
 
-## Timeouts
+## Timeout
 
-Timeouts are a constraint on the runtime of a block of code or a
-Greenlet.
+Timeout sono dei limiti di tempo di esecuzione di un pezzo di codice o una Greenlet.
 
 <pre>
 <code class="python">
@@ -431,7 +391,7 @@ except Timeout:
 </code>
 </pre>
 
-They can also be used with a context manager, in a ``with`` statement.
+I timeout possono anche essere usati con un context manager all'interno di una direttiva ``with``.
 
 <pre>
 <code class="python">import gevent
@@ -447,8 +407,7 @@ with Timeout(time_to_wait, TooLong):
 </code>
 </pre>
 
-In addition, gevent also provides timeout arguments for a
-variety of Greenlet and data stucture related calls. For example:
+Inoltre, gevent fornisce argomenti di timeout per diverse Greenlet, strutture dati e relative chiamate. Per esempio:
 
 [[[cog
 import gevent

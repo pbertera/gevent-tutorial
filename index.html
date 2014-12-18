@@ -35,23 +35,23 @@
     <header>
         <h1><span class="green">gevent</span> For the Working Python Developer</h1>
         <h3 class="author">
-            Written by the Gevent Community
+            Scritto dalla Community Gevent
         </h3>
 
         <blockquote>
-        gevent is a concurrency library based around <a href="http://software.schmorp.de/pkg/libev.html">libev</a>.  It provides a clean API for a variety of concurrency and network related tasks.
+        gevent e' una concurrency library (libreria per la gestione di task concorrenti) basata su <a href="http://software.schmorp.de/pkg/libev.html">libev</a>.  Fornisce un'API chiara per diverse applicazioni di rete e concorrenti.
         </blockquote>
     </header>
 
     <div class="toc">
 <ul>
-<li><a href="#introduction">Introduction</a><ul>
-<li><a href="#contributors">Contributors</a></li>
+<li><a href="#introduzione">Introduzione</a><ul>
+<li><a href="#contributi">Contributi</a></li>
 </ul>
 </li>
 <li><a href="#core">Core</a><ul>
 <li><a href="#greenlets">Greenlets</a></li>
-<li><a href="#synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</a></li>
+<li><a href="#esecuzione-sincrona-asincrona">Esecuzione sincrona &amp; asincrona</a></li>
 <li><a href="#determinism">Determinism</a></li>
 <li><a href="#spawning-greenlets">Spawning Greenlets</a></li>
 <li><a href="#greenlet-state">Greenlet State</a></li>
@@ -82,14 +82,10 @@
 </li>
 </ul>
 </div>
-<h1 id="introduction">Introduction</h1>
-<p>The structure of this tutorial assumes an intermediate level
-knowledge of Python but not much else. No knowledge of
-concurrency is expected. The goal is to give you
-the tools you need to get going with gevent, help you tame
-your existing concurrency problems and start writing asynchronous
-applications today.</p>
-<h3 id="contributors">Contributors</h3>
+<h1 id="introduzione">Introduzione</h1>
+<p>La struttura di questo tutorial richiede solamente un livello intermedio
+di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi di concorrenza. L'obiettivo e' quello di fornirti gli strumenti necessari per lavorare con gevent, aiutarti nel gestire problemi di concorrenza ed iniziare a scrivere codice asincrono oggi.</p>
+<h3 id="contributi">Contributi</h3>
 <p>In chronological order of contribution:
 <a href="http://www.stephendiehl.com">Stephen Diehl</a>
 <a href="https://github.com/jerem">J&eacute;r&eacute;my Bethmont</a>
@@ -102,6 +98,7 @@ applications today.</p>
 <a href="https://github.com/ehebert">Eddie Hebert</a>
 <a href="http://notmyidea.org">Alexis Metaireau</a>
 <a href="https://github.com/djv">Daniel Velkov</a></p>
+<<<<<<< HEAD
 <p>Also thanks to Denis Bilenko for writing gevent and guidance in
 constructing this tutorial.</p>
 <p>This is a collaborative document published under MIT license.
@@ -110,15 +107,22 @@ pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
 Any and all contributions are welcome.</p>
 <p>This page is also available in <a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>, 
 <a href="http://xlambda.com/gevent-tutorial/">Chinese</a> and <a href="http://ovnicraft.github.io/gevent/">Spanish</a>.</p>
+=======
+<p>Grazie anche a Denis Bilenko per aver scritto gevent ed avermi seguito nella scrittura di questo tutorial.</p>
+<p>Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
+Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
+Qualsiasi contributo e' benvenuto.</p>
+<p>Questa pagina e' anche <a href="http://methane.github.com/gevent-tutorial-ja">disponibile in Japanese</a>.</p>
+>>>>>>> master
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
-<p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
-lightweight coroutine provided to Python as a C extension module.
-Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively.</p>
+<p>Il modello principale utilizzato in gevent e' <strong>Greenlet</strong>,
+un'implementazione di coroutine per Python fornita come extension module in C.
+Le Greenlets girano tutte all'interno del processo del programma principale ma sono schedulate in maniera cooperativa.</p>
 <blockquote>
-<p>Only one greenlet is ever running at any given time.</p>
+<p>Sempre e solo una greenlet e' in esecuzione in un data momento.</p>
 </blockquote>
+<<<<<<< HEAD
 <p>This differs from any of the real parallelism constructs provided by
 <code>multiprocessing</code> or <code>threading</code> libraries which do spin processes
 and POSIX threads which are scheduled by the operating system and
@@ -131,6 +135,12 @@ switch between the two subtasks is known as a <em>context switch</em>.</p>
 <p>A context switch in gevent is done through <em>yielding</em>. In this 
 example we have two contexts which yield to each other through invoking
 <code>gevent.sleep(0)</code>.</p>
+=======
+<p>Questo concetto e' diverso da tutti i modelli di parallelismo forniti da librerie di <code>multiprocessing</code> o <code>threading</code> che lanciano processi e thread POSIX schedulati dal sistema operativo e veramente paralleli.</p>
+<h2 id="esecuzione-sincrona-asincrona">Esecuzione sincrona &amp; asincrona</h2>
+<p>L'idea principale della concorrenza e' che un grande task puo' essere spezzato in un'insieme di piccoli sotto-task che vengono fatti girare contemporaneamente o in maniera <em>asincrona</em>, invece di uno alla volta in maniera <em>sincrona</em>. Il passaggio da un sotto-task a un altro viene detto <em>context switch</em>.</p>
+<p>Un context switch in gevent avviene tramite <em>yelding</em> (precedenze). In questo esempio abbiamo due contesti che si danno la precedenza a vicenda invocando <code>gevent.sleep(0)</code>.</p>
+>>>>>>> master
 <pre><code class="python">
 import gevent
 
@@ -157,17 +167,11 @@ Explicit context to bar
 Explicit context switch to foo again
 Implicit context switch back to bar
 </pre></code></p>
-<p>It is illuminating to visualize the control flow of the program or walk
-through it with a debugger to see the context switches as they occur.</p>
+<p>Quest'immagine visualizza chiaramente il flusso del programma oppure e' possibile utilizzare un debugger per vedere i context switch e quando avvengono.</p>
 <p><img alt="Greenlet Control Flow" src="flow.gif" /></p>
-<p>The real power of gevent comes when we use it for network and IO
-bound functions which can be cooperatively scheduled. Gevent has
-taken care of all the details to ensure that your network
-libraries will implicitly yield their greenlet contexts whenever
-possible. I cannot stress enough what a powerful idiom this is.
-But maybe an example will illustrate.</p>
-<p>In this case the <code>select()</code> function is normally a blocking
-call that polls on various file descriptors.</p>
+<p>La vera potenza di gevent quando lo usiamo per delle funzioni di rete e di IO che possono essere schedulate in maniera cooperativa. Gevent si e' preso cura di tutti i dettagli per assicurare che le tue librerie di rete daranno implicitamente la precedenza al loro greenlet context appena possibile. Non posso stressare a sufficienza per rendere l'idea di quanto e' potente questo paradigma.
+Forse un esempio puo' illustrarlo.</p>
+<p>In questo caso la funzione <code>select()</code> e' normalmente una chiamata bloccante che interroga vari file descriptor.</p>
 <pre><code class="python">
 import time
 import gevent
@@ -252,6 +256,7 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
+<<<<<<< HEAD
 Task 4 done
 Task 8 done
 Task 9 done
@@ -262,6 +267,18 @@ Task 1 done
 Task 3 done
 Task 2 done
 Task 7 done
+=======
+Task 1 done
+Task 2 done
+Task 4 done
+Task 0 done
+Task 3 done
+Task 6 done
+Task 7 done
+Task 8 done
+Task 9 done
+Task 5 done
+>>>>>>> master
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -778,26 +795,26 @@ Worker steve got task 1
 Worker john got task 2
 Worker nancy got task 3
 Worker steve got task 4
-Worker nancy got task 5
-Worker john got task 6
+Worker john got task 5
+Worker nancy got task 6
 Worker steve got task 7
 Worker john got task 8
 Worker nancy got task 9
 Worker steve got task 10
-Worker nancy got task 11
-Worker john got task 12
+Worker john got task 11
+Worker nancy got task 12
 Worker steve got task 13
 Worker john got task 14
 Worker nancy got task 15
 Worker steve got task 16
-Worker nancy got task 17
-Worker john got task 18
+Worker john got task 17
+Worker nancy got task 18
 Worker steve got task 19
 Worker john got task 20
 Worker nancy got task 21
 Worker steve got task 22
-Worker nancy got task 23
-Worker john got task 24
+Worker john got task 23
+Worker nancy got task 24
 Quitting time!
 Quitting time!
 Quitting time!
@@ -860,21 +877,21 @@ Worker steve got task 1
 Worker john got task 2
 Worker bob got task 3
 Worker steve got task 4
-Worker bob got task 5
-Worker john got task 6
+Worker john got task 5
+Worker bob got task 6
 Assigned all work in iteration 1
 Worker steve got task 7
 Worker john got task 8
 Worker bob got task 9
 Worker steve got task 10
-Worker bob got task 11
-Worker john got task 12
+Worker john got task 11
+Worker bob got task 12
 Worker steve got task 13
 Worker john got task 14
 Worker bob got task 15
 Worker steve got task 16
-Worker bob got task 17
-Worker john got task 18
+Worker john got task 17
+Worker bob got task 18
 Assigned all work in iteration 2
 Worker steve got task 19
 Quitting time!
@@ -956,11 +973,19 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
+<<<<<<< HEAD
 Hello from Greenlet 35427024
 Size of group 3
 Hello from Greenlet 35427504
 Size of group 3
 Hello from Greenlet 35428464
+=======
+Hello from Greenlet 4511216016
+Size of group 3
+Hello from Greenlet 4511217136
+Size of group 3
+Hello from Greenlet 4511216656
+>>>>>>> master
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1363,24 +1388,6 @@ gevent.joinall([publisher, client])
 
 <p></code>
 <pre><code class="python">
-Switched to Server for 1
-Switched to Client for 1
-Switched to Server for 2
-Switched to Client for 2
-Switched to Server for 3
-Switched to Client for 3
-Switched to Server for 4
-Switched to Client for 4
-Switched to Server for 5
-Switched to Client for 5
-Switched to Server for 6
-Switched to Client for 6
-Switched to Server for 7
-Switched to Client for 7
-Switched to Server for 8
-Switched to Client for 8
-Switched to Server for 9
-Switched to Client for 9
 </pre></code></p>
 <h2 id="simple-servers">Simple Servers</h2>
 <pre>

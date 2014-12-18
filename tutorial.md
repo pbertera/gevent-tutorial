@@ -1,15 +1,11 @@
 [TOC]
 
-# Introduction
+# Introduzione
 
-The structure of this tutorial assumes an intermediate level
-knowledge of Python but not much else. No knowledge of
-concurrency is expected. The goal is to give you
-the tools you need to get going with gevent, help you tame
-your existing concurrency problems and start writing asynchronous
-applications today.
+La struttura di questo tutorial richiede solamente un livello intermedio
+di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi di concorrenza. L'obiettivo e' quello di fornirti gli strumenti necessari per lavorare con gevent, aiutarti nel gestire problemi di concorrenza ed iniziare a scrivere codice asincrono oggi.
 
-### Contributors
+### Contributi
 
 In chronological order of contribution:
 [Stephen Diehl](http://www.stephendiehl.com)
@@ -24,43 +20,36 @@ In chronological order of contribution:
 [Alexis Metaireau](http://notmyidea.org)
 [Daniel Velkov](https://github.com/djv)
 
-Also thanks to Denis Bilenko for writing gevent and guidance in
-constructing this tutorial.
+Grazie anche a Denis Bilenko per aver scritto gevent ed avermi seguito nella scrittura di questo tutorial.
 
-This is a collaborative document published under MIT license.
-Have something to add? See a typo? Fork and issue a
-pull request [Github](https://github.com/sdiehl/gevent-tutorial).
-Any and all contributions are welcome.
+Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
+Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
+Qualsiasi contributo e' benvenuto.
 
+<<<<<<< HEAD
 This page is also available in [Japanese](http://methane.github.com/gevent-tutorial-ja), 
 [Chinese](http://xlambda.com/gevent-tutorial/) and [Spanish](http://ovnicraft.github.io/gevent/).
+=======
+Questa pagina e' anche [disponibile in Japanese](http://methane.github.com/gevent-tutorial-ja).
+>>>>>>> master
 
 # Core
 
 ## Greenlets
 
-The primary pattern used in gevent is the <strong>Greenlet</strong>, a
-lightweight coroutine provided to Python as a C extension module.
-Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively.
+Il modello principale utilizzato in gevent e' <strong>Greenlet</strong>,
+un'implementazione di coroutine per Python fornita come extension module in C.
+Le Greenlets girano tutte all'interno del processo del programma principale ma sono schedulate in maniera cooperativa.
 
-> Only one greenlet is ever running at any given time.
+> Sempre e solo una greenlet e' in esecuzione in un data momento.
 
-This differs from any of the real parallelism constructs provided by
-``multiprocessing`` or ``threading`` libraries which do spin processes
-and POSIX threads which are scheduled by the operating system and
-are truly parallel.
+Questo concetto e' diverso da tutti i modelli di parallelismo forniti da librerie di ``multiprocessing`` o ``threading`` che lanciano processi e thread POSIX schedulati dal sistema operativo e veramente paralleli.
 
-## Synchronous & Asynchronous Execution
+## Esecuzione sincrona & asincrona
 
-The core idea of concurrency is that a larger task can be broken down
-into a collection of subtasks which are scheduled to run simultaneously
-or *asynchronously*, instead of one at a time or *synchronously*. A
-switch between the two subtasks is known as a *context switch*.
+L'idea principale della concorrenza e' che un grande task puo' essere spezzato in un'insieme di piccoli sotto-task che vengono fatti girare contemporaneamente o in maniera *asincrona*, invece di uno alla volta in maniera *sincrona*. Il passaggio da un sotto-task a un altro viene detto *context switch*.
 
-A context switch in gevent is done through *yielding*. In this 
-example we have two contexts which yield to each other through invoking
-``gevent.sleep(0)``.
+Un context switch in gevent avviene tramite *yelding* (precedenze). In questo esempio abbiamo due contesti che si danno la precedenza a vicenda invocando ``gevent.sleep(0)``.
 
 [[[cog
 import gevent
@@ -82,20 +71,14 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-It is illuminating to visualize the control flow of the program or walk
-through it with a debugger to see the context switches as they occur.
+Quest'immagine visualizza chiaramente il flusso del programma oppure e' possibile utilizzare un debugger per vedere i context switch e quando avvengono.
 
 ![Greenlet Control Flow](flow.gif)
 
-The real power of gevent comes when we use it for network and IO
-bound functions which can be cooperatively scheduled. Gevent has
-taken care of all the details to ensure that your network
-libraries will implicitly yield their greenlet contexts whenever
-possible. I cannot stress enough what a powerful idiom this is.
-But maybe an example will illustrate.
+La vera potenza di gevent quando lo usiamo per delle funzioni di rete e di IO che possono essere schedulate in maniera cooperativa. Gevent si e' preso cura di tutti i dettagli per assicurare che le tue librerie di rete daranno implicitamente la precedenza al loro greenlet context appena possibile. Non posso stressare a sufficienza per rendere l'idea di quanto e' potente questo paradigma.
+Forse un esempio puo' illustrarlo.
 
-In this case the ``select()`` function is normally a blocking
-call that polls on various file descriptors.
+In questo caso la funzione ``select()`` e' normalmente una chiamata bloccante che interroga vari file descriptor.
 
 [[[cog
 import time

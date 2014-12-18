@@ -98,22 +98,11 @@ di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi d
 <a href="https://github.com/ehebert">Eddie Hebert</a>
 <a href="http://notmyidea.org">Alexis Metaireau</a>
 <a href="https://github.com/djv">Daniel Velkov</a></p>
-<<<<<<< HEAD
-<p>Also thanks to Denis Bilenko for writing gevent and guidance in
-constructing this tutorial.</p>
-<p>This is a collaborative document published under MIT license.
-Have something to add? See a typo? Fork and issue a
-pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
-Any and all contributions are welcome.</p>
-<p>This page is also available in <a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>, 
-<a href="http://xlambda.com/gevent-tutorial/">Chinese</a> and <a href="http://ovnicraft.github.io/gevent/">Spanish</a>.</p>
-=======
 <p>Grazie anche a Denis Bilenko per aver scritto gevent ed avermi seguito nella scrittura di questo tutorial.</p>
 <p>Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
 Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
 Qualsiasi contributo e' benvenuto.</p>
 <p>Questa pagina e' anche <a href="http://methane.github.com/gevent-tutorial-ja">disponibile in Japanese</a>.</p>
->>>>>>> master
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>Il modello principale utilizzato in gevent e' <strong>Greenlet</strong>,
@@ -122,25 +111,10 @@ Le Greenlets girano tutte all'interno del processo del programma principale ma s
 <blockquote>
 <p>Sempre e solo una greenlet e' in esecuzione in un data momento.</p>
 </blockquote>
-<<<<<<< HEAD
-<p>This differs from any of the real parallelism constructs provided by
-<code>multiprocessing</code> or <code>threading</code> libraries which do spin processes
-and POSIX threads which are scheduled by the operating system and
-are truly parallel.</p>
-<h2 id="synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</h2>
-<p>The core idea of concurrency is that a larger task can be broken down
-into a collection of subtasks which are scheduled to run simultaneously
-or <em>asynchronously</em>, instead of one at a time or <em>synchronously</em>. A
-switch between the two subtasks is known as a <em>context switch</em>.</p>
-<p>A context switch in gevent is done through <em>yielding</em>. In this 
-example we have two contexts which yield to each other through invoking
-<code>gevent.sleep(0)</code>.</p>
-=======
 <p>Questo concetto e' diverso da tutti i modelli di parallelismo forniti da librerie di <code>multiprocessing</code> o <code>threading</code> che lanciano processi e thread POSIX schedulati dal sistema operativo e veramente paralleli.</p>
 <h2 id="esecuzione-sincrona-asincrona">Esecuzione sincrona &amp; asincrona</h2>
 <p>L'idea principale della concorrenza e' che un grande task puo' essere spezzato in un'insieme di piccoli sotto-task che vengono fatti girare contemporaneamente o in maniera <em>asincrona</em>, invece di uno alla volta in maniera <em>sincrona</em>. Il passaggio da un sotto-task a un altro viene detto <em>context switch</em>.</p>
 <p>Un context switch in gevent avviene tramite <em>yelding</em> (precedenze). In questo esempio abbiamo due contesti che si danno la precedenza a vicenda invocando <code>gevent.sleep(0)</code>.</p>
->>>>>>> master
 <pre><code class="python">
 import gevent
 
@@ -211,12 +185,8 @@ Hey lets do some stuff while the greenlets poll, at 0.0 seconds
 Ended Polling: at 2.0 seconds
 Ended Polling: at 2.0 seconds
 </pre></code></p>
-<p>Another somewhat synthetic example defines a <code>task</code> function
-which is <em>non-deterministic</em>
-(i.e. its output is not guaranteed to give the same result for
-the same inputs). In this case the side effect of running the
-function is that the task pauses its execution for a random
-number of seconds.</p>
+<p>Un altro sintetico esempio definisce una funzione <code>task</code> non deterministica (ovvero non garantisce dare sempre lo stesso output per il medesimo input).
+In questo caso l'effetto collaterale e' che il task fermera' l'esecuzione per un numero random di secondi.</p>
 <pre><code class="python">
 import gevent
 import random
@@ -256,29 +226,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-<<<<<<< HEAD
-Task 4 done
-Task 8 done
-Task 9 done
-Task 0 done
-Task 6 done
-Task 5 done
 Task 1 done
 Task 3 done
-Task 2 done
-Task 7 done
-=======
-Task 1 done
-Task 2 done
 Task 4 done
-Task 0 done
-Task 3 done
-Task 6 done
-Task 7 done
 Task 8 done
-Task 9 done
+Task 0 done
 Task 5 done
->>>>>>> master
+Task 6 done
+Task 9 done
+Task 2 done
+Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -973,19 +930,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-<<<<<<< HEAD
-Hello from Greenlet 35427024
+Hello from Greenlet 4449415568
 Size of group 3
-Hello from Greenlet 35427504
+Hello from Greenlet 4449416688
 Size of group 3
-Hello from Greenlet 35428464
-=======
-Hello from Greenlet 4511216016
-Size of group 3
-Hello from Greenlet 4511217136
-Size of group 3
-Hello from Greenlet 4511216656
->>>>>>> master
+Hello from Greenlet 4449416208
 Ordered
 ('task', 0)
 ('task', 1)

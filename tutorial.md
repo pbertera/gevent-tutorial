@@ -112,12 +112,8 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-Another somewhat synthetic example defines a ``task`` function
-which is *non-deterministic*
-(i.e. its output is not guaranteed to give the same result for
-the same inputs). In this case the side effect of running the
-function is that the task pauses its execution for a random
-number of seconds.
+Un altro sintetico esempio definisce una funzione ``task`` non deterministica (ovvero non garantisce dare sempre lo stesso output per il medesimo input).
+In questo caso l'effetto collaterale e' che il task fermera' l'esecuzione per un numero random di secondi.
 
 [[[cog
 import gevent

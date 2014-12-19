@@ -227,10 +227,7 @@ Nonostante gevent sia normalmente deterministica, sorgenti di non-determinismo p
 
 Il perenne problema legato alla concorrenza e' noto come *race condition*. Semplificando, una race condition avviene quando due thread concorrenti / processi dipendono dalla stessa risorsa condivisa ed entrambi provano a modificarne il valore. Questo finira' con delle risorse il cui valore diventa dipendente nel tempo dall'ordine di esecuzione. Questo e' un problema ed in generale si dovrebbe cercare di evitare race condition in quanto portano il risultato ad un comportamento non deterministico. 
 
-Il migliore approccio e' quello di evitare sempre tutti gli stati globali
-
-The best approach to this is to simply avoid all global state at all
-times. Gli effetti collaterali di stati globali e tempi di import torneranno sempre per morderti!
+Il migliore approccio e' quello di evitare sempre tutti gli stati globali. Gli effetti collaterali di stati globali e tempi di import torneranno sempre per morderti!
 
 ## Lanciare Greenlets
 
@@ -446,12 +443,7 @@ except Timeout:
 
 ## Monkeypatching
 
-Alas we come to dark corners of Gevent. I've avoided mentioning
-monkey patching up until now to try and motivate the powerful
-coroutine patterns, but the time has come to discuss the dark arts
-of monkey-patching. If you noticed above we invoked the command
-``monkey.patch_socket()``. This is a purely side-effectful command to
-modify the standard library's socket library.
+Purtroppo siamo giunti al lato oscuro di Gevent. Ho evitato di menzionarlo fino ad ora il monkey patching per cercare di motivare la potenza del modello "coroutine", ma ora dobbiamo parlare dell'arte oscura del monkey-patching. Se avete notato prima e' stato invocato il comando ``monkey.patch_socket()``. Questo e' un comando che modifica la socket standard library.
 
 <pre>
 <code class="python">import socket
@@ -481,32 +473,16 @@ function select at 0x1924de8
 </code>
 </pre>
 
-Python's runtime allows for most objects to be modified at runtime
-including modules, classes, and even functions. This is generally an
-astoudingly bad idea since it creates an "implicit side-effect" that is
-most often extremely difficult to debug if problems occur, nevertheless
-in extreme situations where a library needs to alter the fundamental
-behavior of Python itself monkey patches can be used. In this case gevent
-is capable of patching most of the blocking system calls in the standard
-library including those in ``socket``, ``ssl``, ``threading`` and
-``select`` modules to instead behave cooperatively.
+L'ambiente Python permette di modificare a runtime molti oggetti: moduli, classi ed anche funzioni. In generale questa e' assolutamente una cattiva idea perche' crea un "implicito effetto collaterale" che spesso e' difficile da debuggare, tuttavia in situazioni estreme in cui una libreria deve alterare dei comportamenti base di Python il monkey-patching puo' essere utilizzato. In questo caso gevent e' in grado di "patchare" la gran parte delle systemm call bloccanti nella standard library includendo i moduli ``socket``, ``ssl``, ``threading`` e ``select`` rendendoli in grado di operare in maniera cooperativa.
+Per esempio, i binding Python per Redis usano normalmente dei socket tcp normali per comunicare con un istanza del server redis. Semplicemente invocando ``gevent.monkey.patch_all()`` e' possibile fare in modo che i binding redis schedulino richieste cooperative e possono lavorare con i nostro gevent stack.
 
-For example, the Redis python bindings normally uses regular tcp
-sockets to communicate with the ``redis-server`` instance. Simply
-by invoking ``gevent.monkey.patch_all()`` we can make the redis
-bindings schedule requests cooperatively and work with the rest
-of our gevent stack.
+Questo ci permette di integrare librerie che di solito non lavorano con gevent senza dover scrivere una linea di codice. Siccome il monkey-patching e' sempre il male, in questo caso e' un "male utile".
 
-This lets us integrate libraries that would not normally work with
-gevent without ever writing a single line of code. While monkey-patching
-is still evil, in this case it is a "useful evil".
+# Strutture Dati
 
-# Data Structures
+## Eventi
 
-## Events
-
-Events are a form of asynchronous communication between
-Greenlets.
+Gli eventi sono una forma di comunicazione asincrona tra le Greenlets.
 
 <pre>
 <code class="python">import gevent
@@ -548,11 +524,7 @@ if __name__ == '__main__': main()
 </code>
 </pre>
 
-An extension of the Event object is the AsyncResult which
-allows you to send a value along with the wakeup call. This is
-sometimes called a future or a deferred, since it holds a
-reference to a future value that can be set on an arbitrary time
-schedule.
+Un estensione dell'oggetto Event e' AsyncResult il quale permette di inviare un valore tramite una chiamata di wakeup. Questo viene chiamato anche future o deferred perche' ha un riferimento ad un valore futuro che puo' essere impostato in un momento arbitrario.
 
 <pre>
 <code class="python">import gevent
@@ -581,15 +553,11 @@ gevent.joinall([
 </code>
 </pre>
 
-## Queues
+## Code
 
-Queues are ordered sets of data that have the usual ``put`` / ``get``
-operations but are written in a way such that they can be safely
-manipulated across Greenlets.
+Le code sono degli insiemi ordinati di dati che hanno le solite operazioni ``put`` / ``get` ma sono scritte in modo da essere manipolati tramite delle Greenlet.
 
-For example if one Greenlet grabs an item off of the queue, the
-same item will not be grabbed by another Greenlet executing
-simultaneously.
+Per esempio se una greenlet toglie un componente da una coda, lo stesso componente non potra' essere prelevato da un'altra greenlet che sta girando contemporaneamente.
 
 [[[cog
 import gevent
@@ -619,23 +587,11 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-Queues can also block on either ``put`` or ``get`` as the need arises.
+Le code possono bloccare sia ``put`` che ``get`` se ce n'e' la necessita'.
 
-Each of the ``put`` and ``get`` operations has a non-blocking
-counterpart, ``put_nowait`` and
-``get_nowait`` which will not block, but instead raise
-either ``gevent.queue.Empty`` or
-``gevent.queue.Full`` if the operation is not possible.
+Le operazioni di ``put`` e ``get`` hanno la loro controparte non bloccante: ``put_nowait`` e ``get_nowait`` che non bloccano l'esecuzione ma invece sollevano le eccezioni ``gevent.queue.Empty`` o ``gevent.queue.Full`` se l'operazione non e' possibile.
 
-In this example we have the boss running simultaneously to the
-workers and have a restriction on the Queue preventing it from containing
-more than three elements. This restriction means that the ``put``
-operation will block until there is space on the queue.
-Conversely the ``get`` operation will block if there are
-no elements on the queue to fetch, it also takes a timeout
-argument to allow for the queue to exit with the exception
-``gevent.queue.Empty`` if no work can be found within the
-time frame of the Timeout.
+In questo esempio abbiamo boss che gira in contemporanea con i workers e c'e' un limite sulla coda che impedisce di avere piu' di tre elementi. Questo limite significa che l'operazione ``put`` rimarra' bloccata finche' non ci sara' spazio nella coda. All'inverso la ``get`` rimarra' bloccata se non ci sono elementi da prelevare nella coda, riceve anche un timeout per permettere che la funzione termini con l'eccezione ``gevent.queue.Empty`` se non puo' essere trovato nulla nell'intervallo di Timeout.
 
 [[[cog
 import gevent
@@ -675,11 +631,10 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-## Groups and Pools
+## Gruppi e Pools
 
-A group is a collection of running greenlets which are managed
-and scheduled together as group. It also doubles as parallel
-dispatcher that mirrors the Python ``multiprocessing`` library.
+Un gruppo e' un insieme di greenlet in esecuzione gestite e schedulate assieme come gruppo. 
+A group is a collection of running greenlets which are managed funge anche da dispatcher parallelo come la libreria ``multiprocessing``.
 
 [[[cog
 import gevent
@@ -703,11 +658,9 @@ group.join()
 ]]]
 [[[end]]]
 
-This is very useful for managing groups of asynchronous tasks.
+E' molto utile gestire gruppi di task asincroni.
 
-As mentioned above, ``Group`` also provides an API for dispatching
-jobs to grouped greenlets and collecting their results in various
-ways.
+Come detto prima, ``Group`` prevede anche un'API per fare dispatching di job a gruppi di greenlet e ricevere i risultati in vari modi.
 
 [[[cog
 import gevent
@@ -742,10 +695,7 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 ]]]
 [[[end]]]
 
-A pool is a structure designed for handling dynamic numbers of
-greenlets which need to be concurrency-limited.  This is often
-desirable in cases where one wants to do many network or IO bound
-tasks in parallel.
+Un pool e' una struttura progettata per gestire un numero variabile di greenlet che necessitano di concorrenza limitata. Questo e' spesso necessario quando vogliamo effetuare molti task di rete o di IO.
 
 [[[cog
 import gevent
@@ -760,9 +710,7 @@ pool.map(hello_from, xrange(3))
 ]]]
 [[[end]]]
 
-Often when building gevent driven services one will center the
-entire service around a pool structure. An example might be a
-class which polls on various sockets.
+Spesso, quando si implementano servizi basati su gevent, tutto il servizio ruota attorno ad un pool. Un esempio potrebbe essere una classe che interroga vari sockets.
 
 <pre>
 <code class="python">from gevent.pool import Pool
@@ -789,15 +737,9 @@ class SocketPool(object):
 </code>
 </pre>
 
-## Locks and Semaphores
+## Locks e Semafori
 
-A semaphore is a low level synchronization primitive that allows
-greenlets to coordinate and limit concurrent access or execution. A
-semaphore exposes two methods, ``acquire`` and ``release`` The
-difference between the number of times a semaphore has been
-acquired and released is called the bound of the semaphore. If a
-semaphore bound reaches 0 it will block until another greenlet
-releases its acquisition.
+Un semaforo e' una primitiva a basso livello the permette alle greenlets di coordinare o limitare accessi o esecuzioni concorrenti. Un semaforo espone due metodi, ``acquire`` e ``release`` la differenza tra il numero di volte che un semaforo e' stato acquisito e rilasciato e' chiamato bound (intervallo) del semaforo. Se il bound di un semaforo arriva a 0 finche' un'altra greenlet non rilascia la sua acquisizione.
 
 [[[cog
 from gevent import sleep
@@ -825,17 +767,11 @@ pool.map(worker2, xrange(3,6))
 ]]]
 [[[end]]]
 
-A semaphore with bound of 1 is known as a Lock. it provides
-exclusive execution to one greenlet. They are often used to
-ensure that resources are only in use at one time in the context
-of a program.
+Un semaforo con bound 1 e' detto Lock. Fornisce un esecuzione esclusiva nella greenlet. Sono spesso utilizzati per assicurarsi che una risorsa sia in uso una sola volta nel contesto di un programma.
 
-## Thread Locals
+## Thread Locali
 
-Gevent also allows you to specify data which is local to the
-greenlet context. Internally, this is implemented as a global
-lookup which addresses a private namespace keyed by the
-greenlet's ``getcurrent()`` value.
+Gevent permette anche di specificare dati che sono locali al contesto della greenlet. Internamete questo e' implementato come una ricerca globale che punta ad un namespace privato identificato dal valore ``getcurrent()`` della greenlet.
 
 [[[cog
 import gevent
@@ -863,10 +799,7 @@ gevent.joinall([g1, g2])
 ]]]
 [[[end]]]
 
-Many web frameworks that use gevent store HTTP session
-objects inside gevent thread locals. For example, using the
-Werkzeug utility library and its proxy object we can create
-Flask-style request objects.
+Molti framework web che usano gevent salvano gli oggetti delle sessioni HTTP all'interno di un gevent local thread. Per esempio, utilizzando la libreria Werkzeug ed il suo   Proxy possiamo creare degli oggetti request in stile Flask.
 
 <pre>
 <code class="python">from gevent.local import local
@@ -907,15 +840,12 @@ WSGIServer(('', 8000), application).serve_forever()
 <code>
 </pre>
 
-Flask's system is a bit more sophisticated than this example, but the
-idea of using thread locals as local session storage is nonetheless the
-same.
+Il sistema di Flask e' un po' piu' sofisticato di questo esempio, ma l'idea di utilizzare local thread e local session e' esattamente la stessa.
 
 ## Subprocess
 
-As of gevent 1.0, ``gevent.subprocess`` -- a patched version of Python's
-``subprocess`` module -- has been added. It supports cooperative waiting on
-subprocesses.
+A partire da gevent 1.0, ``gevent.subprocess`` -- una versione modificata del modulo Python
+``subprocess`` -- e' stata aggiunta. Supporta waiting cooperativo su subrocess.
 
 <pre>
 <code class="python">
@@ -945,13 +875,7 @@ Linux
 <code>
 </pre>
 
-Many people also want to use ``gevent`` and ``multiprocessing`` together. One of
-the most obvious challenges is that inter-process communication provided by
-``multiprocessing`` is not cooperative by default. Since
-``multiprocessing.Connection``-based objects (such as ``Pipe``) expose their
-underlying file descriptors, ``gevent.socket.wait_read`` and ``wait_write`` can
-be used to cooperatively wait for ready-to-read/ready-to-write events before
-actually reading/writing:
+Spesso si vuole utilizzare ``gevent`` e ``multiprocessing`` assieme. Una delle sfide piu' ovvie e' che la comicazione inter-processo fornita da ``multiprocessing`` non e' cooperativa di default. Siccome gli oggetti basati su ``multiprocessing.Connection`` (come ``Pipe``) espongono i propri file descriptor sottostanti, ``gevent.socket.wait_read`` e ``wait_write`` possono essere utilizzati per aspettare in maniera cooperativa degli eventi pronto-per-leggere/pronto-per-scrivere prima di iniziare a leggere o scrivere:
 
 <pre>
 <code class="python">
@@ -990,38 +914,21 @@ if __name__ == '__main__':
 </code>
 </pre>
 
-Note, however, that the combination of ``multiprocessing`` and gevent brings
-along certain OS-dependent pitfalls, among others:
+Nota, comunque, la combinazione di ``multiprocessing`` e gevent puo' nascondere alcune insidie dipendenti dal sistema operativo, sopratutto:
 
-* After [forking](http://linux.die.net/man/2/fork) on POSIX-compliant systems
-gevent's state in the child is ill-posed. One side effect is that greenlets
-spawned before ``multiprocessing.Process`` creation run in both, parent and
-child process.
-* ``a.send()`` in ``put_msg()`` above might still block the calling thread
-non-cooperatively: a ready-to-write event only ensures that one byte can be
-written. The underlying buffer might be full before the attempted write is
-complete.
-* The ``wait_write()`` / ``wait_read()``-based approach as indicated above does
-not work on Windows (``IOError: 3 is not a socket (files are not supported)``),
-because Windows cannot watch pipes for events.
+* Dopo il [forking](http://linux.die.net/man/2/fork) su sistemi POSIX lo stato di gevent nel processo figlio e' mal posto. Un problema e' che le greenlet lanciate prima della creazione di ``multiprocessing.Process`` girano sia nel processo padre che nel processo figlio.
 
-The Python package [gipc](http://pypi.python.org/pypi/gipc) overcomes these
-challenges for you in a largely transparent fashion on both, POSIX-compliant and
-Windows systems. It provides gevent-aware ``multiprocessing.Process``-based
-child processes and gevent-cooperative inter-process communication based on
-pipes.
+* ``a.send()`` in ``put_msg()`` menzionate sopra possono bloccare il thread chiamante in maniera non cooperativa: un evento pronto-a-scrivere assicura solo che un byte puo' essere scritto. Il buffer sottostante puo' essere pieno prima che il tentativo di scrittura sia finito.
 
-## Actors
+* L'approccio basato su ``wait_write()`` / ``wait_read()`` non funziona su Windows (``IOError: 3 is not a socket (files are not supported)``), perche' Windows non puo' controllare gli eventi sulle pipe.
 
-The actor model is a higher level concurrency model popularized
-by the language Erlang. In short the main idea is that you have a
-collection of independent Actors which have an inbox from which
-they receive messages from other Actors. The main loop inside the
-Actor iterates through its messages and takes action according to
-its desired behavior.
+Il package Python [gipc](http://pypi.python.org/pypi/gipc) risolve questi problemi in modo per lo piu' trasparente sia su sistemi POSIX che Windows. Fornisce dei processi figli basati su ``multiprocessing.Process``, compatibili con gevent e comunicazione inter-processo basata su pipe.
 
-Gevent does not have a primitive Actor type, but we can define
-one very simply using a Queue inside of a subclassed Greenlet.
+## Attori
+
+Il modello degli attori e' un modello di alto livello reso famoso dal linguaggio Erlang. In breve l'idea principale e' che c'e' una collezione di attori indipendenti che hanno una casella in cui ricevono i messaggi dagli altri attori. Il ciclo principale all'interno dell'attore scorre all'interno dei messaggi e compie azioni secondo il comportamento desiderato.
+
+Gevent non ha un tipo nativo che definisce un attore, ma lo si puo' definire molto semplicemente utilizzando una Coda all'interno di una classe derivata da Greenlet.
 
 <pre>
 <code class="python">import gevent
@@ -1050,7 +957,7 @@ class Actor(gevent.Greenlet):
 </code>
 </pre>
 
-In a use case:
+Un caso di utilizzo:
 
 <pre>
 <code class="python">import gevent
@@ -1080,26 +987,16 @@ gevent.joinall([ping, pong])
 </code>
 </pre>
 
-# Real World Applications
+# Applicazioni nel mondo reale
 
 ## Gevent ZeroMQ
 
-[ZeroMQ](http://www.zeromq.org/) is described by its authors as
-"a socket library that acts as a concurrency framework". It is a
-very powerful messaging layer for building concurrent and
-distributed applications.
+[ZeroMQ](http://www.zeromq.org/) e' descritto dai suoi autori come "una libreria socket che si comporta come un framework concorrente". E' un layer di comunicazione molto potente per la creazione di applicazioni distribuite.
 
-ZeroMQ provides a variety of socket primitives, the simplest of
-which being a Request-Response socket pair. A socket has two
-methods of interest ``send`` and ``recv``, both of which are
-normally blocking operations. But this is remedied by a briliant
-library by [Travis Cline](https://github.com/traviscline) which
-uses gevent.socket to poll ZeroMQ sockets in a non-blocking
-manner.  You can install gevent-zeromq from PyPi via:  ``pip install
-gevent-zeromq``
+ZeroMQ fornisce una varieta' di primitive socket, la piu' semplice crea una coppia di socket Richiesta-Risposta. Un socket ha due metodi importanti ``send`` e ``recv``, entrambi sono normalmente delle operazioni bloccanti. Questo viene risolto brillantemente dalla libreria di [Travis Cline](https://github.com/traviscline) che usa gevent.socket per interrogare dei socket ZeroMQ in modo non bloccante. Puoi installare gevent-zeromq tramite PyPi con il comando: ``pip install gevent-zeromq``
 
 [[[cog
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Nota: Ricordati ``pip install pyzmq gevent_zeromq``
 import gevent
 from gevent_zeromq import zmq
 
@@ -1135,7 +1032,7 @@ gevent.joinall([publisher, client])
 ]]]
 [[[end]]]
 
-## Simple Servers
+## Semplici Server
 
 <pre>
 <code class="python">
@@ -1155,32 +1052,23 @@ server.serve_forever()
 </code>
 </pre>
 
-## WSGI Servers
+## Server WSGI
 
-Gevent provides two WSGI servers for serving content over HTTP.
-Henceforth called ``wsgi`` and ``pywsgi``:
+Gevent fornisce due WSGI server per fornire contenuti su HTTP..
+Sono chiamati ``wsgi`` and ``pywsgi``:
 
 * gevent.wsgi.WSGIServer
 * gevent.pywsgi.WSGIServer
 
-In earlier versions of gevent before 1.0.x, gevent used libevent
-instead of libev. Libevent included a fast HTTP server which was
-used by gevent's ``wsgi`` server.
+Nelle versioni di gevent prima della 1.0.x, gevente usava libevent invece di libev. Libevent includeva un server HTTP performante che veniva utilizzato dal server ``wsgi``  di gevent.
 
-In gevent 1.0.x there is no http server included. Instead
-``gevent.wsgi`` is now an alias for the pure Python server in
-``gevent.pywsgi``.
-
+In gevent 1.0.x non c'e' un server http incluso. Invece ``gevent.wsgi`` e' ora un alias del server ``gevent.pywsgi``.
 
 ## Streaming Servers
 
-**If you are using gevent 1.0.x, this section does not apply**
+**se stai usando gevent 1.0.x, questa sezione non e' valida**
 
-For those familiar with streaming HTTP services, the core idea is
-that in the headers we do not specify a length of the content. We
-instead hold the connection open and flush chunks down the pipe,
-prefixing each with a hex digit indicating the length of the
-chunk. The stream is closed when a size zero chunk is sent.
+Per quelli che hanno familiarita' con servizi di streaming HTTP, l'idea principale e' che negli header non viene specificata la dimensione del body. Viene mantenuta invece la connessione aperta e vengono inviati blocchi di dati nella connessione, facendoli seguire ad un prefisso esadecimale che che indica la lunghezza del blocco. Lo stream e' chiuso quando un blocco di dimensione zero viene inviato.
 
     HTTP/1.1 200 OK
     Content-Type: text/plain
@@ -1194,9 +1082,7 @@ chunk. The stream is closed when a size zero chunk is sent.
 
     0
 
-The above HTTP connection could not be created in wsgi
-because streaming is not supported. It would instead have to
-buffered.
+La connessione HTTP qui sopra non puo' essere creato in un server wsgi perche' lo streaming non e' supportato. Deve invece essere bufferizzato.
 
 <pre>
 <code class="python">from gevent.wsgi import WSGIServer
@@ -1239,13 +1125,9 @@ WSGIServer(('', 8000), application).serve_forever()
 </code>
 </pre>
 
-But regardless, performance on Gevent servers is phenomenal
-compared to other Python servers. libev is a very vetted technology
-and its derivative servers are known to perform well at scale.
+Tuttavia le performance di un server con Gevent sono di gran lunga maggiori di altri server implementati in Python. libev e' una tecnologia molto curata e i server da lei derivati sono noti per le performance e la scalabilita'.
 
-To benchmark, try Apache Benchmark ``ab`` or see this
-[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers)
-for comparison with other servers.
+Per verificarlo e' possibile utilizzare Apache Benchmark ``ab`` o vedere questo [Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers) per fare una comparazione con gli altri server.
 
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
@@ -1292,7 +1174,7 @@ WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 
 ## Websockets
 
-Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.
+Esempio di websocket che richiede <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.
 
 
 <pre>
@@ -1359,11 +1241,7 @@ HTML Page:
 
 ## Chat Server
 
-The final motivating example, a realtime chat room. This example
-requires <a href="http://flask.pocoo.org/">Flask</a> ( but not necessarily so, you could use Django,
-Pyramid, etc ). The corresponding Javascript and HTML files can
-be found <a href="https://github.com/sdiehl/minichat">here</a>.
-
+Il motivante esempio finale, una chatroom in realtime. Questo esempio richiede <a href="http://flask.pocoo.org/">Flask</a> (ma non necessariamente, puo' funzionare anche con Django, Pyramid, ecc..). I corrispondenti file Javascript e HTML possono essere trovati <a href="https://github.com/sdiehl/minichat">qui</a>.
 
 <pre>
 <code class="python"># Micro gevent chatroom.

@@ -1,15 +1,15 @@
 Versione Online: http://pbertera.github.io/gevent-tutorial-it/
 =========================================================
 
-Want to add an example. Its uber simple.
+Vuoi aggiungere un esempio ? E' semplicissimo.
 
-1. Fork the repo.
+1. Forka il repository.
 2. ``pip install -r requirements.txt``
-3. Edit ``tutorial.md``.
+3. Modifica ``tutorial.md``.
 
-Add your text as Markdown.
+Aggiunti il tuo testo in Markdown.
 
-Add your code as Cog:
+Aggiungi il tuo testo con Cog:
 
      [[[cog
 
@@ -21,7 +21,7 @@ Add your code as Cog:
      [[[end]]]
 
 
-Will output this as html:
+Verra' stampato in html:
 
     <pre>
     <code class="python">
@@ -43,11 +43,11 @@ Will output this as html:
     </code>
     </pre>
 
-4. Run ``./build``
-5. Issue pull request.
-6. Get good gevent karma.
+4. Lancia ``./build``
+5. Crea una pull request.
+6. Ti auguro un buon gevent karma.
 
-Released under MIT License.
+Rilasciato con licenza MIT.
 
     Copyright (c) 2011 Stephen Diehl, <stephen.m.diehl@gmail.com>
 

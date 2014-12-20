@@ -102,7 +102,11 @@ di conoscenza di Python. Non non sono necessarie conoscenze specifiche su temi d
 <p>Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
 Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
 Qualsiasi contributo e' benvenuto.</p>
-<p>Questa pagina e' anche <a href="http://methane.github.com/gevent-tutorial-ja">disponibile in Japanese</a>.</p>
+<p>Questa pagina e' dispnibile anche in
+<a href="http://sdiehl.github.io/gevent-tutorial/">Inglese</a>,
+<a href="http://methane.github.com/gevent-tutorial-ja">Giapponese</a>,
+<a href="http://xlambda.com/gevent-tutorial/">Cinese</a> e
+<a href="http://ovnicraft.github.io/gevent/">Spagnolo</a>.</p>
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>Il modello principale utilizzato in gevent e' <strong>Greenlet</strong>,
@@ -228,14 +232,14 @@ Task 9 done
 Asynchronous:
 Task 0 done
 Task 2 done
+Task 4 done
 Task 6 done
-Task 1 done
+Task 8 done
 Task 5 done
 Task 7 done
-Task 8 done
-Task 9 done
+Task 1 done
 Task 3 done
-Task 4 done
+Task 9 done
 </pre></code></p>
 <p>Nel caso sincrono tutti i task sono lanciati in maniera sequenziale, facendo cosi' che il programma principale rimanga in stato <em>blocking</em> (rimane bloccato finche' non e' terminato ogni task) durante l'esecuzione dei task.</p>
 <p>La parte importante del programma e' il <code>gevent.spawn</code> che include la funzione passata all'interno di un Greenlet thread. La lista delle greenlet inizializzate viene salvata nell'array <code>threads</code> il quale viene passato alla funzione <code>gevent.joinall</code> la quale blocca l'esecuzione del programma corrente e lancia tutte le greenlet ricevute. L'esecuzione del programma principale riprendera' quando tutte le greenlet sono terminate.</p>
@@ -843,11 +847,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 4446753168
+Hello from Greenlet 4550623632
 Size of group 3
-Hello from Greenlet 4446754288
+Hello from Greenlet 4550624752
 Size of group 3
-Hello from Greenlet 4446753808
+Hello from Greenlet 4550624272
 Ordered
 ('task', 0)
 ('task', 1)

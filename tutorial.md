@@ -26,7 +26,11 @@ Questo e' un documento scritto in collaborazione e pubblicato con licenza MIT.
 Vuoi aggiungere qualcosa ? Hai trovato un errore ? Fai un fork e richiedi un pull Github](https://github.com/sdiehl/gevent-tutorial).
 Qualsiasi contributo e' benvenuto.
 
-Questa pagina e' anche [disponibile in Japanese](http://methane.github.com/gevent-tutorial-ja).
+Questa pagina e' dispnibile anche in
+[Inglese](http://sdiehl.github.io/gevent-tutorial/),
+[Giapponese](http://methane.github.com/gevent-tutorial-ja),
+[Cinese](http://xlambda.com/gevent-tutorial/) e
+[Spagnolo](http://ovnicraft.github.io/gevent/).
 
 # Core
 
